@@ -43,6 +43,7 @@ DATA_DIR = os.path.join(os.environ.get("APPDATA", ""), "ResolveTimeTracker")
 SESSIONS_FILE = os.path.join(DATA_DIR, "sessions.json")
 CONFIG_FILE = os.path.join(DATA_DIR, "config.json")
 STATE_FILE = os.path.join(DATA_DIR, "state.json")  # reader -> UI: current project/page
+RAISE_FILE = os.path.join(DATA_DIR, "raise.request")  # launcher -> UI: bring to front
 LOCK_FILE = os.path.join(DATA_DIR, "poller.lock")
 LOG_FILE = os.path.join(DATA_DIR, "poller.log")
 
@@ -1348,11 +1349,26 @@ def run_ui(poller):
             pass
         root.after(60, animate)
 
+    def bring_to_front():
+        # Clicking the Resolve menu item while we're already running touches
+        # RAISE_FILE; pull the existing window up and focus it (nice UX vs. a
+        # silent no-op).
+        try:
+            if os.path.exists(RAISE_FILE):
+                os.remove(RAISE_FILE)
+                root.deiconify()
+                root.lift()
+                root.attributes("-topmost", True)
+                root.after(50, root.focus_force)
+        except Exception:
+            pass
+
     def loop():
         try:
             poller.tick()
             touch_lock()
             refresh()
+            bring_to_front()
             # Follow the OS theme live when set to "System".
             if poller.theme() == "system" and system_is_dark() != built_system_dark:
                 log("System theme changed; rebuilding UI")

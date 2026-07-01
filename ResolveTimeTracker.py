@@ -62,7 +62,7 @@ def find_pythonw():
     cands += sorted(glob.glob(r"C:\Python3*\pythonw.exe"), reverse=True)
     cands += sorted(glob.glob(
         os.path.join(os.environ.get("LOCALAPPDATA", ""),
-                     r"Programs\Python\Python3*\pythonw.exe"), reverse=True))
+                     r"Programs\Python\Python3*\pythonw.exe")), reverse=True)
     for c in cands:
         if os.path.exists(c):
             return c
@@ -75,6 +75,7 @@ PYTHONW = find_pythonw()
 DATA_DIR = os.path.join(os.environ.get("APPDATA", ""), "ResolveTimeTracker")
 LOG_FILE = os.path.join(DATA_DIR, "tracker.log")
 LOCK_FILE = os.path.join(DATA_DIR, "poller.lock")
+RAISE_FILE = os.path.join(DATA_DIR, "raise.request")  # ask a running poller to surface
 os.makedirs(DATA_DIR, exist_ok=True)
 
 
@@ -126,10 +127,17 @@ def poller_running():
 def launch():
     log("=== Launcher invoked ===")
     if poller_running():
-        log("Poller already running; nothing to do.")
+        # Already running: surface the existing window instead of a silent no-op.
+        log("Poller already running; requesting bring-to-front.")
+        try:
+            with open(RAISE_FILE, "w", encoding="utf-8") as f:
+                f.write(str(time.time()))
+        except Exception:
+            log("raise request failed:\n{}".format(traceback.format_exc()))
         return
     if not os.path.exists(POLLER_PATH):
-        log("Poller not found at {}".format(POLLER_PATH))
+        log("Poller not found at {} (set RESOLVE_TIMETRACKER_REPO or copy "
+            "tracker_poller.py next to the launcher)".format(POLLER_PATH))
         return
     exe = PYTHONW
     try:
