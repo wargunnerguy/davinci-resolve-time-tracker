@@ -32,6 +32,10 @@ Thumbs.db
 desktop.ini
 .DS_Store
 
+# Icon source art — embedded as base64 in ResolveTimeTracker.py, so the raw
+# files aren't needed to run and are kept out of the public repo.
+Icons/
+
 # Claude (local only — not committed)
 CLAUDE.md
 .claude/

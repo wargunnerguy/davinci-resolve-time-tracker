@@ -1,111 +1,122 @@
 # DaVinci Resolve Time Tracker
 
-Per-project, **per-page** time tracking for DaVinci Resolve Studio (Edit / Color /
-Fairlight / Deliver / …), with hourly rate → earnings.
----
+A lightweight, always-on-top **time tracker for DaVinci Resolve Studio** — tracks
+how long you spend per project and **per page** (Media, Cut, Edit, Fusion, Color,
+Fairlight, Deliver, Photo), turns it into **earnings** at your hourly rate, and
+exports a tidy CSV for invoicing.
 
-## How it works (two parts)
-
-A Resolve script window **cannot update itself on a timer** (Resolve limitation),
-so the tracker is split:
-
-| Part | Runs in | Role |
-|------|---------|------|
-| **`tracker_poller.py`** | System Python (`C:\Python314`), separate process | The whole app. Connects to Resolve, polls the current page every second, writes `sessions.json`, and shows a live always-on-top **Tkinter** window. |
-| **`ResolveTimeTracker.py`** | Inside Resolve (Workspace → Scripts) | A tiny **launcher** — just starts the poller so you have one window. No window of its own. |
-
-The poller is the **sole writer** of `sessions.json`; settings/rates live in `config.json`.
-
-### Features (live window)
-
-- Breathing status dot, big session clock + persistent **Total**
-- Green **per-page % bars**, with the **active page row highlighted**
-- **Pause / Resume**, **rate → earnings**
-- **Forward-only rate**: changing the rate only affects time tracked from then on; past time keeps the rate it was tracked at (great for invoicing)
-- Per-project **due-date countdown** beside the project name
-- **⚙ Settings**: language (English / Eesti), theme (Dark / Light / System), currency, rate type (Gross/Net/Employer cost), due date
-- **Stats / Export**: per-project table with editable rate + **CSV export** (Excel-ready, billing + per-page sections)
+One file. No installs beyond Python. No accounts, no cloud — your data stays on
+your machine.
 
 ---
 
-## Requirements
+## Screenshots
 
-- DaVinci Resolve **Studio** (scripting API required) on **Windows 10/11**
-- **External scripting enabled**: Resolve → Preferences → System → General →
-  *External scripting using* = **Local**
-- A **system Python** with Tkinter (e.g. `C:\Python314`) — used by the poller.
-  (Tkinter ships with standard CPython on Windows.)
-- No pip packages — stdlib + Resolve's bundled `DaVinciResolveScript` module only.
+> _Screenshots coming soon._
+
+| Main window | Mini pill | Stats / Export |
+|:---:|:---:|:---:|
+| ![Main window](screenshots/main.png) | ![Mini pill](screenshots/mini.png) | ![Stats and export](screenshots/stats.png) |
+
+---
+
+## What it does
+
+- ⏱️ **Live tracking** of the active project and page, second by second
+- 📊 **Per-page bars** — see where your time goes; the active page lights up
+- 💶 **Earnings** from your hourly rate, with **today's** and **total** shown
+- ⏸️ **Idle auto-pause** (with a live "idle for 3m" readout) and **auto-resume**
+- 🪟 **Mini mode** — shrink to a slim pill showing just what you choose
+- 🧾 **Stats & CSV export** with a history view and date ranges, ready for invoicing
+- 🌗 **Themes & languages** — Dark / Light / System, English / Eesti
+- 🔝 **Always-on-top by default** (can be turned off in Settings)
 
 ---
 
 ## Install
 
-1. **Copy both `ResolveTimeTracker.py` and `tracker_poller.py`** into Resolve's
-   Scripts/Utility folder (keep them together — the launcher finds the poller
-   next to itself):
-   ```
-   C:\Users\<you>\AppData\Roaming\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\
-   ```
+**Easiest — double-click `install.bat`.** It copies the app into Resolve's
+Scripts folder, checks you have Python, and reminds you of the one Resolve setting.
 
-2. **Restart Resolve.** The tracker now appears under
-   **Workspace → Scripts → Utility → ResolveTimeTracker**.
+**Or manually:** copy `ResolveTimeTracker.py` into
+`…\Blackmagic Design\DaVinci Resolve\Support\Fusion\Scripts\Utility\`.
 
-That's it — the launcher locates a system Python automatically (it looks for
-`C:\Python3*\pythonw.exe` and the per-user Python install, then `pythonw` on
-`PATH`). If your Python lives somewhere unusual, set `PYTHONW` at the top of
-`ResolveTimeTracker.py`.
+Then, once:
 
-> **Developers:** instead of copying, point Resolve at your working copy with a
-> stub in the Utility folder so edits take effect without re-copying:
-> ```python
-> import os
-> os.environ["RESOLVE_TIMETRACKER_REPO"] = r"<repo>"   # your local working copy
-> exec(open(r"<repo>\ResolveTimeTracker.py", encoding="utf-8").read())
-> ```
-> `encoding="utf-8"` is required — the repo files contain `€`/`●`. The
-> `RESOLVE_TIMETRACKER_REPO` env var lets the launcher find the poller when run
-> this way, and keeps your personal path out of the repo.
+1. In Resolve: **Preferences → System → General → *External scripting using* = Local**
+2. **Restart Resolve**
+
+Launch it from **Workspace → Scripts → ResolveTimeTracker**.
+
+### Requirements
+
+- DaVinci Resolve **Studio** on **Windows 10/11**
+- **Python 3** for Windows ([python.org](https://www.python.org/downloads/) — keep
+  the defaults; Tkinter is included). If it's missing, the app tells you.
+
+That's the whole list — no pip packages to install.
 
 ---
 
-## Usage
+## Tips
 
-1. In Resolve: **Workspace → Scripts → Utility → ResolveTimeTracker** → launches
-   the live window (always-on-top) and begins tracking the current project/page.
-2. Work as normal. The window shows the session clock, total, per-page bars,
-   earnings, and the due countdown. Use **Pause/Resume**, the **rate** field, the
-   **⚙ Settings** gear, and **Stats / Export**.
-
-You can also start the app directly:
-```powershell
-C:\Python314\pythonw.exe "<repo>\tracker_poller.py"
-```
-
----
-
-## Data files (`%APPDATA%\ResolveTimeTracker\`)
-
-| File | Contents |
-|------|----------|
-| `sessions.json` | Per-project per-page time (poller is sole writer) |
-| `config.json` | Settings: currency, rate type, language, theme, idle/resume, per-project rates & due dates |
-| `state.json` | Current project/page/timecode (written by the reader process, read by the UI) |
-| `poller.lock` | Single-instance lock (also drives the "Live: running" status) |
-| `poller.log` | Live tracker log |
-| `tracker.log` | Reports window log |
+- Click the **rate** field to change your hourly rate (past time keeps its old rate).
+- Hit **Mini** to dock a compact pill out of the way; double-click it to expand.
+- **Settings (⚙)** covers language, theme, currency, billing (simple or with tax
+  views), idle behaviour, the mini pill, always-on-top, and more.
+- **Stats** opens the per-project table, history, and CSV export.
 
 ---
 
 ## Troubleshooting
 
-**Reports window doesn't appear in Resolve** — confirm the stub is in
-`Support\Fusion\Scripts\Utility\` and restart Resolve once.
+**Not in the Scripts menu?** Re-run `install.bat` (or confirm the file is in the
+`Scripts\Utility` folder) and restart Resolve.
 
-**Live window won't start / "Live: stopped"** — check `poller.log`. Ensure
-external scripting is enabled in Resolve, Resolve is open, and a system Python
-with Tkinter is installed (if it's in an unusual place, set `PYTHONW` at the top
-of `ResolveTimeTracker.py`).
+**Clicking it does nothing?** Make sure external scripting is set to **Local**,
+Resolve is open, and Python is installed. Details are logged to
+`%APPDATA%\ResolveTimeTracker\poller.log`.
 
-**Times look wrong** — only one poller should run at a time (the lock enforces
-this). The live window is the source of truth; the reports window is a snapshot.
+---
+
+## For developers / how it works
+
+<details>
+<summary>Architecture, data files, and running from source</summary>
+
+A Resolve script window can't update on a timer, so the single
+`ResolveTimeTracker.py` plays three roles depending on how it's started:
+
+| Started as | Runs in | Role |
+|------------|---------|------|
+| Scripts menu (no args) | Resolve's Python | **Launcher** — starts the tracker in system Python, or surfaces it if already open. No window of its own. |
+| `--poller` | System Python | **The tracker** — the live Tkinter window; sole writer of `sessions.json`. |
+| `--reader <pid>` | System Python | Polls Resolve into `state.json` (separate process so playback never freezes the UI). |
+
+Run from source (with a console, to see errors):
+```powershell
+C:\Python314\python.exe "<repo>\ResolveTimeTracker.py" --poller
+```
+
+Data lives in `%APPDATA%\ResolveTimeTracker\`:
+
+| File | Contents |
+|------|----------|
+| `sessions.json` | Per-project, per-page time (tracker is sole writer) |
+| `config.json` | Settings & per-project rates / due dates |
+| `state.json` | Current project/page (reader → UI) |
+| `poller.lock` | Single-instance lock (PID-verified) |
+| `poller.log` | Log for all roles |
+
+No third-party dependencies — Python stdlib (incl. Tkinter) plus Resolve's bundled
+`DaVinciResolveScript` module. Icons are original art embedded as base64 in the file.
+
+</details>
+
+---
+
+## Disclaimer
+
+Not affiliated with, authorized, or endorsed by Blackmagic Design.
+"DaVinci Resolve" is a trademark of Blackmagic Design Pty Ltd. This is an
+independent, unofficial tool.
