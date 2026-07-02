@@ -198,7 +198,7 @@ STRINGS = {
         "scope_any": "Terve arvuti", "scope_resolve": "Ainult Resolve'is",
         "resume_label": "Automaatne jätk:",
         "resume_any": "Suvaline tegevus", "resume_resolve": "Ainult Resolve'is",
-        "minimize": "Väike", "mini_hint": "topeltklõps ribal suurendab",
+        "minimize": "Mini", "mini_hint": "topeltklõps ribal suurendab",
         "save_prompt": "Sul on salvestamata muudatusi. Kas salvestada?", "discard": "Loobu",
         "sec_general": "Üldine", "sec_billing": "Arveldus", "sec_due": "Tähtaeg",
         "sec_idle": "Tegevusetus ja tegevus", "sec_mini": "Väike vaade (ribal näidatav)",
@@ -548,7 +548,7 @@ EXTRA = {
     "scope_any": "整台电脑", "scope_resolve": "仅在 Resolve 内",
     "resume_label": "自动恢复条件:",
     "resume_any": "任何活动", "resume_resolve": "仅在 Resolve 内",
-    "minimize": "迷你", "mini_hint": "双击条形以展开",
+    "minimize": "Mini", "mini_hint": "双击条形以展开",
     "save_prompt": "有未保存的更改。是否保存？", "discard": "放弃",
     "sec_general": "常规", "sec_billing": "计费", "sec_due": "截止日期",
     "sec_idle": "空闲与活动", "sec_mini": "迷你视图（药丸中显示）",
@@ -597,7 +597,7 @@ EXTRA = {
     "scope_any": "コンピューター全体", "scope_resolve": "Resolve 内のみ",
     "resume_label": "自動再開の条件:",
     "resume_any": "あらゆる操作", "resume_resolve": "Resolve 内のみ",
-    "minimize": "ミニ", "mini_hint": "バーをダブルクリックで展開",
+    "minimize": "Mini", "mini_hint": "バーをダブルクリックで展開",
     "save_prompt": "未保存の変更があります。保存しますか？", "discard": "破棄",
     "sec_general": "一般", "sec_billing": "請求", "sec_due": "期限",
     "sec_idle": "アイドルと操作", "sec_mini": "ミニ表示（ピル内）",
@@ -646,7 +646,7 @@ EXTRA = {
     "scope_any": "컴퓨터 전체", "scope_resolve": "Resolve 내에서만",
     "resume_label": "자동 재개 조건:",
     "resume_any": "모든 활동", "resume_resolve": "Resolve 내에서만",
-    "minimize": "미니", "mini_hint": "막대를 더블클릭하여 펼치기",
+    "minimize": "Mini", "mini_hint": "막대를 더블클릭하여 펼치기",
     "save_prompt": "저장하지 않은 변경사항이 있습니다. 저장할까요?", "discard": "버리기",
     "sec_general": "일반", "sec_billing": "청구", "sec_due": "마감",
     "sec_idle": "유휴 및 활동", "sec_mini": "미니 보기 (알약에 표시)",
@@ -695,7 +695,7 @@ EXTRA = {
     "scope_any": "पूरा कंप्यूटर", "scope_resolve": "केवल Resolve में",
     "resume_label": "स्वतः पुनः आरंभ:",
     "resume_any": "कोई भी गतिविधि", "resume_resolve": "केवल Resolve में",
-    "minimize": "मिनी", "mini_hint": "फैलाने के लिए बार पर डबल-क्लिक करें",
+    "minimize": "Mini", "mini_hint": "फैलाने के लिए बार पर डबल-क्लिक करें",
     "save_prompt": "असहेजे बदलाव हैं। सहेजें?", "discard": "छोड़ें",
     "sec_general": "सामान्य", "sec_billing": "बिलिंग", "sec_due": "नियत तिथि",
     "sec_idle": "निष्क्रियता और गतिविधि", "sec_mini": "मिनी दृश्य (पिल में)",
@@ -744,7 +744,7 @@ EXTRA = {
     "scope_any": "الحاسوب بالكامل", "scope_resolve": "داخل Resolve فقط",
     "resume_label": "الاستئناف التلقائي عند:",
     "resume_any": "أي نشاط", "resume_resolve": "داخل Resolve فقط",
-    "minimize": "مصغّر", "mini_hint": "انقر مزدوجًا على الشريط للتوسيع",
+    "minimize": "Mini", "mini_hint": "انقر مزدوجًا على الشريط للتوسيع",
     "save_prompt": "توجد تغييرات غير محفوظة. حفظ؟", "discard": "تجاهل",
     "sec_general": "عام", "sec_billing": "الفوترة", "sec_due": "الموعد النهائي",
     "sec_idle": "الخمول والنشاط", "sec_mini": "العرض المصغّر (في الكبسولة)",
@@ -1139,7 +1139,8 @@ def default_config():
             "lang": "en", "theme": "dark", "idle_minutes": 5,
             "activity_scope": "any", "resume_scope": "any",
             "mini_fields": ["dot", "timer", "earnings"],
-            "mini_pos": None, "start_mini": False, "mini_alpha": 100,
+            "mini_pos": None, "main_pos": None, "start_mini": False,
+            "mini_alpha": 100,
             # Rate is always entered as GROSS. Each named view is simply a
             # PERCENT OF GROSS to display: 100 = gross, 80 = net (20% tax off),
             # 134 = employer cost (+34%). Users rename/add/remove freely.
@@ -1173,6 +1174,7 @@ def load_config():
                 if isinstance(mf, list):
                     cfg["mini_fields"] = mf
                 cfg["mini_pos"] = raw.get("mini_pos", cfg["mini_pos"])
+                cfg["main_pos"] = raw.get("main_pos", cfg["main_pos"])
                 cfg["start_mini"] = bool(raw.get("start_mini", cfg["start_mini"]))
                 cfg["mini_alpha"] = raw.get("mini_alpha", cfg["mini_alpha"])
                 # Custom rate views (validate). Older configs stored pct as a
@@ -1907,6 +1909,12 @@ def run_ui(poller):
     root.title("Resolve Time Tracker")
     root.attributes("-topmost", poller.always_on_top())
     root.geometry("380x500")
+    _mp = poller.config.get("main_pos")  # restore last full-window position
+    if isinstance(_mp, list) and len(_mp) == 2:
+        try:
+            root.geometry("+{}+{}".format(int(_mp[0]), int(_mp[1])))
+        except Exception:
+            pass
     root.minsize(340, 440)
     root.configure(bg=BG)
     # Borderless: we draw our own title bar. Keep the taskbar button and give the
@@ -2756,6 +2764,12 @@ def run_ui(poller):
 
             if new_lang != old_lang or new_theme != old_theme:
                 # Whole-window rebuild; skip the toast (it'd fire post-destroy).
+                try:  # keep the current position across the rebuild
+                    if not mini["active"]:
+                        poller.update_config(
+                            main_pos=[root.winfo_x(), root.winfo_y()])
+                except Exception:
+                    pass
                 result["restart"] = True
                 root.destroy()
                 return
@@ -2858,6 +2872,10 @@ def run_ui(poller):
             return
         close_settings_panel()  # the panel is a full-mode affordance
         mini["full_geom"] = root.geometry()
+        try:  # remember where the full window was, even if we quit from mini
+            poller.update_config(main_pos=[root.winfo_x(), root.winfo_y()])
+        except Exception:
+            pass
         titlebar.pack_forget()  # no title bar in the pill
         content.pack_forget()
         mini["frame"] = build_mini_frame()
@@ -3072,6 +3090,12 @@ def run_ui(poller):
             # Follow the OS theme live when set to "System".
             if poller.theme() == "system" and system_is_dark() != built_system_dark:
                 log("System theme changed; rebuilding UI")
+                try:
+                    if not mini["active"]:
+                        poller.update_config(
+                            main_pos=[root.winfo_x(), root.winfo_y()])
+                except Exception:
+                    pass
                 result["restart"] = True
                 root.destroy()
                 return
@@ -3083,6 +3107,8 @@ def run_ui(poller):
         try:
             if mini["active"]:
                 poller.update_config(mini_pos=[root.winfo_x(), root.winfo_y()])
+            else:
+                poller.update_config(main_pos=[root.winfo_x(), root.winfo_y()])
             poller.save(force=True)
             poller.stop_reader()
         except Exception:

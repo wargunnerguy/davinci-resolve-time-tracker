@@ -12,8 +12,6 @@ your machine.
 
 ## Screenshots
 
-> _Screenshots coming soon._
-
 | Main window | Mini pill | Stats / Export |
 |:---:|:---:|:---:|
 | ![Main window](screenshots/main.png) | ![Mini pill](screenshots/mini.png) | ![Stats and export](screenshots/stats.png) |
@@ -28,7 +26,9 @@ your machine.
 - ⏸️ **Idle auto-pause** (with a live "idle for 3m" readout) and **auto-resume**
 - 🪟 **Mini mode** — shrink to a slim pill showing just what you choose
 - 🧾 **Stats & CSV export** with a history view and date ranges, ready for invoicing
-- 🌗 **Themes & languages** — Dark / Light / System, English / Eesti
+- 🌗 **Themes & languages** — Dark / Light / System, and 13 UI languages
+  (English, Eesti, Latviešu, Lietuvių, Español, Português, Français, Deutsch,
+  中文, 日本語, 한국어, हिन्दी, العربية)
 - 🔝 **Always-on-top by default** (can be turned off in Settings)
 
 ---
