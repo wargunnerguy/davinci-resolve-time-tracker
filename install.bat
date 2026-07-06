@@ -36,6 +36,8 @@ set "PYEXE="
 call :findpy py
 if not defined PYEXE call :findpy python
 if not defined PYEXE if exist "C:\Python314\python.exe" set "PYEXE=C:\Python314\python.exe"
+if not defined PYEXE for /d %%D in ("%ProgramFiles%\Python3*") do if exist "%%D\python.exe" set "PYEXE=%%D\python.exe"
+if not defined PYEXE for /d %%D in ("%LocalAppData%\Programs\Python\Python3*") do if exist "%%D\python.exe" set "PYEXE=%%D\python.exe"
 
 if defined PYEXE (
   echo   [OK] Found Python with Tkinter: %PYEXE%
